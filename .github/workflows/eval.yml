@@ -37,25 +37,17 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      # ── 4. Create venv and install dependencies ───────────────────
+      # ── 4. Install dependencies ───────────────────────────────────────
       - name: Install dependencies
-        run: |
-          uv venv
-          source .venv/bin/activate
-          uv sync
-          uv pip install pytest scipy
+        run: uv sync
 
       # ── 5. Run unit tests (Phase 4 ranking tests) ─────────────────
       - name: Run unit tests
-        run: |
-          source .venv/bin/activate
-          python -m pytest tests/test_ranking.py tests/test_eval.py -v --tb=short
+        run: uv run pytest tests/test_ranking.py tests/test_eval.py -v --tb=short
 
       # ── 6. Run evaluation harness (Phase 7) ───────────────────────
       - name: Run evaluation harness
-        run: |
-          source .venv/bin/activate
-          python -m eval.run_eval --ci
+        run: uv run python -m eval.run_eval --ci
 
       # ── 7. Upload eval report as artifact ─────────────────────────
       - name: Upload eval report
