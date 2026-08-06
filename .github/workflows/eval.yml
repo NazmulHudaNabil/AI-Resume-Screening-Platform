@@ -42,7 +42,7 @@ jobs:
         run: |
           uv venv
           source .venv/bin/activate
-          uv pip install -r pyproject.toml
+          uv sync
           uv pip install pytest scipy
 
       # ── 5. Run unit tests (Phase 4 ranking tests) ─────────────────
