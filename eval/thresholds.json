@@ -1,0 +1,9 @@
+{
+    "_comment": "Phase 7 — Evaluation thresholds for CI gating. If any metric falls below its threshold, the eval-gate fails the build.",
+
+    "spearman_correlation_min": 0.60,
+    "precision_at_3_min": 0.55,
+    "ndcg_at_3_min": 0.65,
+    "skill_overlap_mae_max": 0.20,
+    "experience_fit_mae_max": 0.15
+}

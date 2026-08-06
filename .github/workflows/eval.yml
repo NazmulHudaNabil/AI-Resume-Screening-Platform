@@ -1,0 +1,69 @@
+##############################################################################
+# eval.yml — Phase 7 Evaluation Gate
+#
+# Runs on every push and pull request.
+# Steps: lint → unit tests → eval harness → fail if metrics regress.
+#
+# The eval harness only uses pure Python scoring functions — no DB,
+# no Qdrant, no LLM API keys needed. Safe to run in any CI environment.
+##############################################################################
+
+name: Eval Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-eval:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout code ──────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Python ──────────────────────────────────────────
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ── 3. Install uv (fast Python package manager) ───────────────
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      # ── 4. Create venv and install dependencies ───────────────────
+      - name: Install dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv pip install -r pyproject.toml
+          uv pip install pytest scipy
+
+      # ── 5. Run unit tests (Phase 4 ranking tests) ─────────────────
+      - name: Run unit tests
+        run: |
+          source .venv/bin/activate
+          python -m pytest tests/test_ranking.py tests/test_eval.py -v --tb=short
+
+      # ── 6. Run evaluation harness (Phase 7) ───────────────────────
+      - name: Run evaluation harness
+        run: |
+          source .venv/bin/activate
+          python -m eval.run_eval --ci
+
+      # ── 7. Upload eval report as artifact ─────────────────────────
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: |
+            eval/reports/eval_report.json
+            eval/reports/eval_report.md
+          retention-days: 30

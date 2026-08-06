@@ -1,0 +1,63 @@
+{
+  "eval_timestamp": "2026-08-06T17:21:00.153073+00:00",
+  "total_scenarios": 3,
+  "total_candidates": 18,
+  "aggregate_metrics": {
+    "spearman_correlation": 0.9619,
+    "precision_at_3": 0.8889,
+    "ndcg_at_3": 0.9812,
+    "kendall_tau": 0.9111,
+    "skill_overlap_mae": 0.0391,
+    "skill_accuracy_pct": 100.0,
+    "experience_fit_mae": 0.0
+  },
+  "per_scenario": [
+    {
+      "job_title": "Senior Backend Python Developer",
+      "num_candidates": 6,
+      "metrics": {
+        "spearman_correlation": 0.9429,
+        "precision_at_3": 0.6667,
+        "ndcg_at_3": 0.9552,
+        "kendall_tau": 0.8667,
+        "skill_overlap_mae": 0.0189,
+        "skill_accuracy_pct": 100.0,
+        "experience_fit_mae": 0.0
+      }
+    },
+    {
+      "job_title": "Frontend React Developer",
+      "num_candidates": 6,
+      "metrics": {
+        "spearman_correlation": 1.0,
+        "precision_at_3": 1.0,
+        "ndcg_at_3": 1.0,
+        "kendall_tau": 1.0,
+        "skill_overlap_mae": 0.0484,
+        "skill_accuracy_pct": 100.0,
+        "experience_fit_mae": 0.0
+      }
+    },
+    {
+      "job_title": "DevOps / Cloud Engineer",
+      "num_candidates": 6,
+      "metrics": {
+        "spearman_correlation": 0.9429,
+        "precision_at_3": 1.0,
+        "ndcg_at_3": 0.9883,
+        "kendall_tau": 0.8667,
+        "skill_overlap_mae": 0.05,
+        "skill_accuracy_pct": 100.0,
+        "experience_fit_mae": 0.0
+      }
+    }
+  ],
+  "thresholds": {
+    "_comment": "Phase 7 \u2014 Evaluation thresholds for CI gating. If any metric falls below its threshold, the eval-gate fails the build.",
+    "spearman_correlation_min": 0.6,
+    "precision_at_3_min": 0.55,
+    "ndcg_at_3_min": 0.65,
+    "skill_overlap_mae_max": 0.2,
+    "experience_fit_mae_max": 0.15
+  }
+}
