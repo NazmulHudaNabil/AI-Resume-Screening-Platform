@@ -4,6 +4,12 @@ from app.core.config import settings
 
 # Use asyncpg driver for async SQLAlchemy with PostgreSQL
 db_url = settings.database_url
+
+# Handle Neon/Supabase default URLs which include unsupported query parameters
+# asyncpg does not support 'sslmode', 'channel_binding', etc., and negotiates SSL automatically.
+if "?" in db_url:
+    db_url = db_url.split("?")[0]
+
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 elif db_url.startswith("postgresql+psycopg://") or db_url.startswith("postgresql+psycopg2://"):
