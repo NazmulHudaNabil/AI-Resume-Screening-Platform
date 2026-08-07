@@ -6,6 +6,12 @@ Unlike a single-resume "ATS checker," this platform is built the way real screen
 
 ---
 
+## 🎥 Project Demo
+
+[▶️ Watch the Full Project Demo](https://youtu.be/LY_IVoANR60)
+
+---
+
 ## Features
 
 - **Bulk ingestion** — upload a job description and a batch of resumes (PDF/DOCX)
