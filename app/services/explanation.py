@@ -54,7 +54,7 @@ def get_redis_client() -> redis.Redis:
     Local default: redis://localhost:6379/0
     Upstash cloud: set REDIS_URL=rediss://:token@host:port in .env
     """
-    url = settings.redis_url
+    url = settings.redis_url.strip('"').strip("'")
     if url.startswith("http"):
         raise ValueError(
             "You provided an HTTP REST URL for Redis. Please go to your Upstash "
@@ -62,9 +62,11 @@ def get_redis_client() -> redis.Redis:
             "copy the URL that starts with 'rediss://'"
         )
 
+    ssl_kwargs = {"ssl_cert_reqs": "none"} if url.startswith("rediss://") else {}
     return redis.from_url(
         url,
         decode_responses=True,  # always return strings, not bytes
+        **ssl_kwargs
     )
 
 

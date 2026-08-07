@@ -4,8 +4,10 @@ import redis.asyncio as redis
 from app.core.security import verify_token
 from app.core.config import settings
 
-# Initialize redis connection for rate limiting
-redis_client = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+# Initialize redis connection for rate limiting (strip quotes and ignore ssl certs for Upstash)
+clean_redis_url = settings.redis_url.strip('"').strip("'")
+ssl_kwargs = {"ssl_cert_reqs": "none"} if clean_redis_url.startswith("rediss://") else {}
+redis_client = redis.from_url(clean_redis_url, encoding="utf-8", decode_responses=True, **ssl_kwargs)
 
 def rate_limiter(times: int, seconds: int):
     """
