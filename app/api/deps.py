@@ -13,21 +13,29 @@ def rate_limiter(times: int, seconds: int):
     Fails with 429 Too Many Requests if the limit is exceeded.
     """
     async def dependency(request: Request):
-        client_ip = request.client.host if request.client else "127.0.0.1"
-        # Key includes the path and IP to isolate limits
-        key = f"rate_limit:{client_ip}:{request.url.path}"
-        
-        # Increment request count
-        current = await redis_client.incr(key)
-        # If this is the first request, set the expiration window
-        if current == 1:
-            await redis_client.expire(key, seconds)
+        try:
+            client_ip = request.client.host if request.client else "127.0.0.1"
+            # Key includes the path and IP to isolate limits
+            key = f"rate_limit:{client_ip}:{request.url.path}"
             
-        if current > times:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Too Many Requests"
-            )
+            # Increment request count
+            current = await redis_client.incr(key)
+            # If this is the first request, set the expiration window
+            if current == 1:
+                await redis_client.expire(key, seconds)
+                
+            if current > times:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Too Many Requests"
+                )
+        except HTTPException:
+            raise
+        except Exception as e:
+            # Fail-open: if Redis crashes, log it but don't break the API
+            print(f"Warning: Redis Rate Limiter failed: {e}")
+            pass
+            
     return dependency
 from app.core.security import verify_token
 

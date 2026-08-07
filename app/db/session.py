@@ -6,9 +6,17 @@ from app.core.config import settings
 db_url = settings.database_url
 
 # Handle Neon/Supabase default URLs which include unsupported query parameters
-# asyncpg does not support 'sslmode', 'channel_binding', etc., and negotiates SSL automatically.
-if "?" in db_url:
-    db_url = db_url.split("?")[0]
+# asyncpg requires ?ssl=require instead of ?sslmode=require
+if "?sslmode=require" in db_url:
+    db_url = db_url.replace("?sslmode=require", "?ssl=require")
+elif "&sslmode=require" in db_url:
+    db_url = db_url.replace("&sslmode=require", "&ssl=require")
+    
+# Remove channel_binding if present (asyncpg doesn't support it)
+if "&channel_binding=require" in db_url:
+    db_url = db_url.replace("&channel_binding=require", "")
+elif "?channel_binding=require" in db_url:
+    db_url = db_url.replace("?channel_binding=require", "?")
 
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
