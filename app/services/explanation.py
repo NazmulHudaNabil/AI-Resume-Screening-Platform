@@ -46,20 +46,23 @@ LLM_MODEL = "llama-3.3-70b-versatile"
 # REDIS CLIENT
 # ─────────────────────────────────────────────────────────────────────
 
-def get_redis_client() -> redis.Redis:
+def get_redis_client():
     """
     Create and return a Redis client.
-
-    Uses the REDIS_URL from your .env file.
-    Local default: redis://localhost:6379/0
-    Upstash cloud: set REDIS_URL=rediss://:token@host:port in .env
+    Prefers Upstash REST API for maximum cloud compatibility.
+    Falls back to standard REDIS_URL otherwise.
     """
+    if settings.upstash_redis_rest_url and settings.upstash_redis_rest_token:
+        from upstash_redis import Redis as UpstashRedis
+        return UpstashRedis(
+            url=settings.upstash_redis_rest_url,
+            token=settings.upstash_redis_rest_token
+        )
+
     url = settings.redis_url.strip('"').strip("'")
     if url.startswith("http"):
         raise ValueError(
-            "You provided an HTTP REST URL for Redis. Please go to your Upstash "
-            "dashboard, scroll to 'Connect to your database', select 'Python', and "
-            "copy the URL that starts with 'rediss://'"
+            "You provided an HTTP REST URL for REDIS_URL. Please set UPSTASH_REDIS_REST_URL instead."
         )
 
     ssl_kwargs = {"ssl_cert_reqs": "none"} if url.startswith("rediss://") else {}

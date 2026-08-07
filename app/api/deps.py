@@ -1,13 +1,22 @@
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
-import redis.asyncio as redis
+import redis.asyncio as aioredis
+from upstash_redis.asyncio import Redis as UpstashRedis
 from app.core.security import verify_token
 from app.core.config import settings
 
-# Initialize redis connection for rate limiting (strip quotes and ignore ssl certs for Upstash)
-clean_redis_url = settings.redis_url.strip('"').strip("'")
-ssl_kwargs = {"ssl_cert_reqs": "none"} if clean_redis_url.startswith("rediss://") else {}
-redis_client = redis.from_url(clean_redis_url, encoding="utf-8", decode_responses=True, **ssl_kwargs)
+# Initialize redis connection for rate limiting
+if settings.upstash_redis_rest_url and settings.upstash_redis_rest_token:
+    # Use REST API (failsafe over HTTP)
+    redis_client = UpstashRedis(
+        url=settings.upstash_redis_rest_url,
+        token=settings.upstash_redis_rest_token
+    )
+else:
+    # Fallback to standard Redis protocol
+    clean_redis_url = settings.redis_url.strip('"').strip("'")
+    ssl_kwargs = {"ssl_cert_reqs": "none"} if clean_redis_url.startswith("rediss://") else {}
+    redis_client = aioredis.from_url(clean_redis_url, encoding="utf-8", decode_responses=True, **ssl_kwargs)
 
 def rate_limiter(times: int, seconds: int):
     """
