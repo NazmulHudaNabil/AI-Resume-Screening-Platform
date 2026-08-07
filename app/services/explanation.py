@@ -77,22 +77,21 @@ def get_redis_client():
 # CACHE KEY BUILDER
 # ─────────────────────────────────────────────────────────────────────
 
-def _make_cache_key(job_id: str, candidate_id: str, profile: dict) -> str:
+def _make_cache_key(job_id: str, profile: dict, full_resume_text: str) -> str:
     """
-    Build a unique Redis key for this (job, candidate, profile) combination.
+    Build a unique Redis key for this (job, profile, resume) combination.
 
-    We include a hash of the profile so that if the profile is
-    re-extracted (and changes), we automatically skip the old cache
-    and generate a fresh explanation.
+    We hash the extracted profile and the raw resume text. This guarantees that
+    if the EXACT same resume is uploaded again for the same job, it will hit the cache
+    even though the candidate_id is brand new!
 
     Example key:
-      "explanation:abc-123:def-456:a1b2c3d4"
+      "explanation:abc-123:a1b2c3d4"
     """
-    profile_hash = hashlib.md5(
-        json.dumps(profile, sort_keys=True).encode()
-    ).hexdigest()[:8]  # first 8 chars is enough to be unique
+    content_to_hash = json.dumps(profile, sort_keys=True) + full_resume_text
+    content_hash = hashlib.md5(content_to_hash.encode("utf-8")).hexdigest()[:12]
 
-    return f"explanation:{job_id}:{candidate_id}:{profile_hash}"
+    return f"explanation:{job_id}:{content_hash}"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -260,7 +259,7 @@ def generate_explanation(
     """
 
     # ── Step 1: Build cache key ───────────────────────────────────────
-    cache_key = _make_cache_key(job_id, candidate_id, profile)
+    cache_key = _make_cache_key(job_id, profile, full_resume_text)
 
     # ── Step 2: Check Redis cache ─────────────────────────────────────
     r = None
