@@ -106,7 +106,7 @@ For a deep dive into the architecture, internals, and deployment of this platfor
 ## Quickstart
 
 ```bash
-git clone <repo-url> && cd resume-screening-platform
+git clone https://github.com/NazmulHudaNabil/AI-Resume-Screening-Platform.git && cd resume-screening-platform
 uv venv && source .venv/bin/activate
 uv sync
 
