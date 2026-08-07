@@ -3,7 +3,7 @@ import requests
 import time
 import json
 
-API_URL = "https://ai-resume-screening-platform-wkeo.onrender.com/"
+API_URL = "https://ai-resume-screening-platform-wkeo.onrender.com/api/v1"
 
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 

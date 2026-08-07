@@ -33,8 +33,8 @@ from app.core.security import verify_token
 
 # This tells FastAPI to look for the token in the Authorization header:
 # "Authorization: Bearer <token>"
-# We'll use a dummy tokenUrl for now since we just have a simple /token endpoint
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# We use the absolute path to the token endpoint so Swagger UI at /docs can find it.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """
