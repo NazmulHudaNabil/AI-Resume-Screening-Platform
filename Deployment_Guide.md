@@ -57,8 +57,8 @@ If you already host multiple applications on [Render](https://render.com/), it m
 2. Connect your GitHub repository.
 3. In the setup screen:
    - **Environment:** Docker
-   - **Build Command:** *(leave blank, Render uses the `docker/Dockerfile.prod` file)*
-   - **Start Command:** *(leave blank)*
+   - **Dockerfile Path:** `docker/Dockerfile.prod` *(⚠️ CRITICAL: You must type this in! Render defaults to `./Dockerfile` which will fail).*
+   - **Docker Context:** `.` *(the root directory)*
 4. Scroll down to **Environment Variables** and add:
    - `DATABASE_URL`: *(your Neon URL)*
    - `QDRANT_URL`: *(your Qdrant URL)*
